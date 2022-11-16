@@ -14,7 +14,7 @@ import ModalPopup from "../components/elements/ModalPopup";
 
 function Bill() {
   // ES2022 @start: Settings
-  let itemsPerPage = 4;
+  let itemsPerPage = 2;
   const [nfts, setNfts] = React.useState([]);
   const [initNfts, setInitNfts] = React.useState([]);
   const [collections, setCollections] = React.useState([]);
