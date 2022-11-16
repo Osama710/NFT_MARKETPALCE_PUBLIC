@@ -3462,7 +3462,13 @@ textarea.form-control-lg {
 .card-img-top,
 .card-img-bottom {
   width: 100%; }
-
+.spinner_body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+}
 .card-img,
 .card-img-top {
   border-top-left-radius: 15px;

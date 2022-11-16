@@ -33,6 +33,7 @@
         "react-icons": "^4.6.0",
         "react-js-snackbar": "^1.0.4",
         "react-moralis": "^1.4.2",
+        "react-paginate": "^8.1.4",
         "react-perfect-scrollbar": "^1.5.8",
         "react-redux": "^8.0.5",
         "react-slick": "^0.29.0",
