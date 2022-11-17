@@ -117,7 +117,7 @@ function Bill() {
     if (isInitialized) {
       initial();
     }
-  }, []);
+  }, [isInitialized]);
 
   React.useEffect(() => {
     if (filteredCollection) {
@@ -134,7 +134,7 @@ function Bill() {
     setIsLoading(false);
   };
 
-  setTimeout(() => {
+  setInterval(() => {
     setIsLoading(true);
     setTimeout(() => {
       recalling();
