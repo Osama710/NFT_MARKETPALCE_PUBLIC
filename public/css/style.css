@@ -3469,6 +3469,9 @@ textarea.form-control-lg {
   flex-direction: column;
   gap: 10px;
 }
+.walletconnect-modal__footer {
+  flex-wrap: wrap;
+}
 .card-img,
 .card-img-top {
   border-top-left-radius: 15px;

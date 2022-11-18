@@ -3,33 +3,30 @@ import Moralis from "moralis";
 import * as referral from "../../utils/referrals";
 import { useMoralis, useMoralisCloudFunction } from "react-moralis";
 import { useDeviceSelectors } from "react-device-detect";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 const imageMM = () => <img src={"/images/metamask-fox.svg"} height={32} />;
 const imageWC = () => (
   <img src={"/images/walletconnect-circle-blue.png"} height={32} />
 );
 
-const Facebook = () => (
-  <img src={"/images/facebook.png"} height={32} />
-);
+const Facebook = () => <img src={"/images/facebook.png"} height={32} />;
 
-const Google = () => (
-  <img src={"/images/google.png"} height={32} />
-);
+const Google = () => <img src={"/images/google.png"} height={32} />;
 
-const Apple = () => (
-  <img src={"/images/appstore.png"} height={32} />
-);
+const Apple = () => <img src={"/images/appstore.png"} height={32} />;
 
 const Signup = (props) => {
   const validation = async () => (await import("vanila-js-validation")).default;
   const [isMobileB, setIsMobileB] = React.useState(false);
+  const { data: session } = useSession();
   React.useEffect(() => {
     const [selectors, data] = useDeviceSelectors(window?.navigator?.userAgent);
     const { isMobile } = selectors;
     setIsMobileB(isMobile);
   }, []);
 
+  console.log(session);
   const [register, setRegister] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -46,8 +43,9 @@ const Signup = (props) => {
   const [validPassword, setValidPassword] = React.useState(true);
   const [validPasswordConf, setValidPasswordConf] = React.useState(true);
 
-  const { login, authenticate, enableWeb3, isWeb3Enabled, isAuthenticated } = useMoralis();
-  const moralisCloudSendWallet = useMoralisCloudFunction('sendWalletViaEmail');
+  const { login, authenticate, enableWeb3, isWeb3Enabled, isAuthenticated } =
+    useMoralis();
+  const moralisCloudSendWallet = useMoralisCloudFunction("sendWalletViaEmail");
 
   React.useEffect(() => {
     if (!isWeb3Enabled && isAuthenticated) {
@@ -55,6 +53,15 @@ const Signup = (props) => {
       console.log("web3 activated");
     }
   }, [isWeb3Enabled, isAuthenticated]);
+
+  React.useEffect(() => {
+    const enableit = async () => {
+      if (window.localStorage.walletconnect) {
+        await Moralis.enable({ provider: "walletconnect" });
+      }
+    };
+    enableit();
+  }, []);
 
   const connectWallet = async (provider = "metamask") => {
     localStorage.removeItem("WALLETCONNECT_DEEPLINK_CHOICE");
@@ -313,11 +320,6 @@ const Signup = (props) => {
               )}
               Link WalletConnect {imageWC()}
             </button>
-
-
-
-
-
           </div>
         </div>
       </div>
@@ -434,20 +436,42 @@ const Signup = (props) => {
               </a>
             </>
           )}
-          <p className="mb-0 mt-1" style={{cursor:'pointer'}}>Forget Password</p>
+          <p className="mb-0 mt-1" style={{ cursor: "pointer" }}>
+            Forget Password
+          </p>
           <div className={"d-grid gap-2 mt-4 mb-2"}>
             {error && <div className="form-text text-danger">{error}</div>}
             {submit}
           </div>
-          <div style={{ width: "100%", display: 'flex', alignItems: 'center', justifyContent: 'center',textAlign:'center' }}>
-            <h6>OR<br></br>Login With</h6>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <h6>
+              OR<br></br>Login With
+            </h6>
           </div>
 
           <div className={"d-grid gap-2 mt-2"}>
-            <div style={{ width: "100%", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
               <button
                 className={"btn btn-outline-primary btn-lg"}
-                onClick={() => connectWallet("walletconnect")}
+                // onClick={() => connectWallet("walletconnect")}
+                onClick={() => signIn("facebook")}
               >
                 {isLoading && (
                   <span
@@ -456,11 +480,13 @@ const Signup = (props) => {
                     aria-hidden="true"
                   ></span>
                 )}
-                 {Facebook()}
+                {Facebook()}
               </button>
-              <button style={{marginLeft:'10px'}}
+              <button
+                style={{ marginLeft: "10px" }}
                 className={"btn btn-outline-primary btn-lg"}
-                onClick={() => connectWallet("walletconnect")}
+                // onClick={() => connectWallet("walletconnect")}
+                onClick={() => signIn("apple")}
               >
                 {isLoading && (
                   <span
@@ -469,11 +495,13 @@ const Signup = (props) => {
                     aria-hidden="true"
                   ></span>
                 )}
-                 {Apple()}
+                {Apple()}
               </button>
-              <button style={{marginLeft:'10px'}}
+              <button
+                style={{ marginLeft: "10px" }}
                 className={"btn btn-outline-primary btn-lg"}
-                onClick={() => connectWallet("walletconnect")}
+                // onClick={() => connectWallet("walletconnect")}
+                onClick={() => signIn("google")}
               >
                 {isLoading && (
                   <span
@@ -482,11 +510,10 @@ const Signup = (props) => {
                     aria-hidden="true"
                   ></span>
                 )}
-                 {Google()}
+                {Google()}
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </>
