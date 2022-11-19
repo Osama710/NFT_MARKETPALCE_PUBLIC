@@ -26,9 +26,9 @@ const Signup = (props) => {
     setIsMobileB(isMobile);
   }, []);
 
-  console.log(session);
   const [register, setRegister] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading2, setIsLoading2] = React.useState(false);
 
   const [username, setUsername] = React.useState("");
   const [error, setError] = React.useState();
@@ -43,25 +43,32 @@ const Signup = (props) => {
   const [validPassword, setValidPassword] = React.useState(true);
   const [validPasswordConf, setValidPasswordConf] = React.useState(true);
 
-  const { login, authenticate, enableWeb3, isWeb3Enabled, isAuthenticated } =
-    useMoralis();
+  const {
+    login,
+    authenticate,
+    enableWeb3,
+    isWeb3Enabled,
+    isAuthenticated,
+    isInitialized,
+    // Moralis,
+  } = useMoralis();
   const moralisCloudSendWallet = useMoralisCloudFunction("sendWalletViaEmail");
 
   React.useEffect(() => {
     if (!isWeb3Enabled && isAuthenticated) {
-      enableWeb3({ provider: "walletconnect" });
+      Moralis.enableWeb3({ provider: "walletconnect" });
       console.log("web3 activated");
     }
-  }, [isWeb3Enabled, isAuthenticated]);
+  }, [isWeb3Enabled, isAuthenticated, isInitialized]);
 
-  React.useEffect(() => {
-    const enableit = async () => {
-      if (window.localStorage.walletconnect) {
-        await Moralis.enable({ provider: "walletconnect" });
-      }
-    };
-    enableit();
-  }, []);
+  // React.useEffect(() => {
+  //   const enableit = async () => {
+  //     if (window.localStorage.walletconnect) {
+  //       await Moralis.enable({ provider: "walletconnect" });
+  //     }
+  //   };
+  //   enableit();
+  // }, []);
 
   const connectWallet = async (provider = "metamask") => {
     localStorage.removeItem("WALLETCONNECT_DEEPLINK_CHOICE");
@@ -121,7 +128,8 @@ const Signup = (props) => {
       isValidEmail &&
       isValidEmailConfirmation &&
       isValidPassword &&
-      isPasswordConfirmed
+      isPasswordConfirmed &&
+      isInitialized
     ) {
       setIsLoading(true);
       const u = new Moralis.User();
@@ -192,7 +200,7 @@ const Signup = (props) => {
     const isValidUsername = Validation.matchMinLength(username, 6);
     const isValidPassword = Validation.matchMinLength(password, 6);
 
-    if (isValidUsername && isValidPassword) {
+    if (isValidUsername && isValidPassword && isInitialized) {
       setIsLoading(true);
       try {
         const l = await login(username, password, { usePost: true });
@@ -285,6 +293,28 @@ const Signup = (props) => {
       </>
     );
   }
+
+  const handleCustomLogin = async () => {
+    setIsLoading2(true);
+    if (!isAuthenticated) {
+      await authenticate({
+        provider: "web3Auth",
+        clientId:
+          "BJMn2ZFW8AAdVNzfkVJMzkM7SPknWAL-08SYa-OEbCZNpT1A67R47G3BOKw38A6elKp3uPXWMmM4m_zqc7Xr_us",
+        chainId: Moralis.Chains.ETH_ROPSTEN,
+        loginMethodsOrder: ["google", "facebook", "apple"],
+        signingMessage:
+          "Select ine of the following to continue to Mars NFT Marketplace.",
+      })
+        .then(function (user) {
+          console.log(user?.get("ethAddress"));
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    setIsLoading2(false);
+  };
 
   return (
     <>
@@ -453,11 +483,27 @@ const Signup = (props) => {
             }}
           >
             <h6>
-              OR<br></br>Login With
+              OR
+              {/* <br></br>Login With */}
             </h6>
           </div>
-
           <div className={"d-grid gap-2 mt-2"}>
+            <button
+              className={"btn btn-outline-primary btn-lg"}
+              onClick={handleCustomLogin}
+            >
+              {isLoading2 && (
+                <span
+                  className="spinner-grow spinner-grow-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              )}
+              Register with a Social Account
+            </button>
+          </div>
+
+          {/* <div className={"d-grid gap-2 mt-2"}>
             <div
               style={{
                 width: "100%",
@@ -513,7 +559,7 @@ const Signup = (props) => {
                 {Google()}
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

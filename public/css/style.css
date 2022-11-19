@@ -3469,6 +3469,18 @@ textarea.form-control-lg {
   flex-direction: column;
   gap: 10px;
 }
+#w3a-modal{
+  z-index: 1;
+}
+.w3ajs-email-passwordless,
+.w3ajs-external-wallet,
+.w3ajs-socials-adapters li {
+  display: none;
+}
+.w3ajs-socials-adapters li:nth-child(-n+2),
+.w3ajs-socials-adapters li:nth-child(6) {
+  display: block;
+}
 .walletconnect-modal__footer {
   flex-wrap: wrap;
 }

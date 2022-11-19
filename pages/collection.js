@@ -134,12 +134,12 @@ function Bill() {
     setIsLoading(false);
   };
 
-  setInterval(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      recalling();
-    }, 2000);
-  }, 20000);
+  // setInterval(() => {
+  //   setIsLoading(true);
+  //   setTimeout(() => {
+  //     recalling();
+  //   }, 2000);
+  // }, 20000);
 
   const endOffset = itemOffset + itemsPerPage;
   let currentItems = nfts?.slice(itemOffset, endOffset);
