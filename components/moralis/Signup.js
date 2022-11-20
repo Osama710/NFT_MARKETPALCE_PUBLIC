@@ -301,17 +301,17 @@ const Signup = (props) => {
         provider: "web3Auth",
         clientId:
           "BJMn2ZFW8AAdVNzfkVJMzkM7SPknWAL-08SYa-OEbCZNpT1A67R47G3BOKw38A6elKp3uPXWMmM4m_zqc7Xr_us",
-        chainId: Moralis.Chains.ETH_ROPSTEN,
+        // chainId: Moralis.Chains.ETH_ROPSTEN,
         loginMethodsOrder: ["google", "facebook", "apple"],
         signingMessage:
           "Select ine of the following to continue to Mars NFT Marketplace.",
-      })
-        .then(function (user) {
-          console.log(user?.get("ethAddress"));
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      });
+      // .then(function (user) {
+      //   console.log(user?.get("ethAddress"));
+      // })
+      // .catch(function (error) {
+      //   console.log(error);
+      // });
     }
     setIsLoading2(false);
   };
