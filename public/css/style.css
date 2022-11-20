@@ -3474,7 +3474,8 @@ textarea.form-control-lg {
 }
 .w3ajs-email-passwordless,
 .w3ajs-external-wallet,
-.w3ajs-socials-adapters li {
+.w3ajs-socials-adapters li,
+#w3a-modal .w3a-modal__footer {
   display: none;
 }
 .w3ajs-socials-adapters li:nth-child(-n+2),

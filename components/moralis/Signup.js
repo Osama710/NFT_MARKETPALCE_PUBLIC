@@ -299,8 +299,10 @@ const Signup = (props) => {
     if (!isAuthenticated) {
       await authenticate({
         provider: "web3Auth",
+        // clientId:
+        //   "BJMn2ZFW8AAdVNzfkVJMzkM7SPknWAL-08SYa-OEbCZNpT1A67R47G3BOKw38A6elKp3uPXWMmM4m_zqc7Xr_us",
         clientId:
-          "BJMn2ZFW8AAdVNzfkVJMzkM7SPknWAL-08SYa-OEbCZNpT1A67R47G3BOKw38A6elKp3uPXWMmM4m_zqc7Xr_us",
+          "BA2J-9Nj1n-QEsy8jQykjy0Plz-iFmShLHPbYNXv8NN1VkFcKOJ99_cwDD2mfFdkBcPuISut-HRQP_pZ6BMDHys",
         // chainId: Moralis.Chains.ETH_ROPSTEN,
         loginMethodsOrder: ["google", "facebook", "apple"],
         signingMessage:

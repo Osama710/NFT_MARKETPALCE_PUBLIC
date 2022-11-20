@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { Modal } from "react-bootstrap";
 
@@ -16,17 +17,19 @@ const ModalPopup = (props) => {
       </Modal.Header>
       <Modal.Body>
         <p>
-          it is necessary to have added the wallet to Metamask, it needs access
-          to polygon network and that the gas fee should be set to maximum
+          To buy this NFT, you have to login first. It is necessary to have
+          added the wallet to Metamask.
         </p>
       </Modal.Body>
       <Modal.Footer>
-        <button
-          className="btn btn-outline-primary btn-lg"
-          onClick={props.onHide}
-        >
-          Continue
-        </button>
+        <Link href={"/signup"}>
+          <button
+            className="btn btn-outline-primary btn-lg"
+            // onClick={props.onHide}
+          >
+            Continue
+          </button>
+        </Link>
       </Modal.Footer>
     </Modal>
   );

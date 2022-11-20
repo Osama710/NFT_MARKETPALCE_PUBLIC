@@ -1,27 +1,31 @@
-import React from 'react';
-import { initPurchase, initPurchaseStripe } from '../../utils/moralis';
-import Link from 'next/link';
-import { moneyFormatMartexToDollar, truncate } from '../../utils/converters';
-import { useMoralis } from 'react-moralis';
-import { useDeviceSelectors } from 'react-device-detect';
+import React from "react";
+import { initPurchase, initPurchaseStripe } from "../../utils/moralis";
+import Link from "next/link";
+import { moneyFormatMartexToDollar, truncate } from "../../utils/converters";
+import { useMoralis } from "react-moralis";
+import { useDeviceSelectors } from "react-device-detect";
+import ModalPopup from "../elements/ModalPopup";
 
 const NFTCard = (props) => {
-  const Facebook = () => (
-    <img src={"/images/facebook.png"} height={32} />
+  const Facebook = () => <img src={"/images/facebook.png"} height={32} />;
+  const [isshare, setisshare] = React.useState(false);
+  const Refresh = () => (
+    <img
+      style={{
+        filter:
+          "brightness(0) saturate(100%) invert(35%) sepia(82%) saturate(4075%) hue-rotate(240deg) brightness(96%) contrast(97%)",
+      }}
+      src={"/images/refresh.png"}
+      height={20}
+    />
   );
-  const [isshare,setisshare]= React.useState(false)
-  
-  const Instagram = () => (
-    <img src={"/images/Instagram.png"} height={32} />
-  );
-  const Discord = () => (
-    <img src={"/images/Discord.png"} height={32} />
-  );
-  const Whatsapp = () => (
-    <img src={"/images/Whatsapp.png"} height={32} />
-  );
-  const { item, collections } = props;
+
+  const Instagram = () => <img src={"/images/Instagram.png"} height={32} />;
+  const Discord = () => <img src={"/images/Discord.png"} height={32} />;
+  const Whatsapp = () => <img src={"/images/Whatsapp.png"} height={32} />;
+  const { item, collections, initial } = props;
   const [width, setWidth] = React.useState();
+  const [modalShow, setModalShow] = React.useState(false);
   const [internalLoading, setInternalLoading] = React.useState(false);
   const listRef = React.useRef();
   const { isAuthenticated, isWeb3Enabled, enableWeb3 } = useMoralis();
@@ -34,7 +38,7 @@ const NFTCard = (props) => {
 
   React.useEffect(() => {
     if (!isWeb3Enabled && isAuthenticated) {
-      enableWeb3({ provider: isMobile ? "walletconnect" : 'metamask' });
+      enableWeb3({ provider: isMobile ? "walletconnect" : "metamask" });
     }
   }, [isWeb3Enabled, isAuthenticated]);
 
@@ -49,8 +53,8 @@ const NFTCard = (props) => {
   }, []);
 
   const getCollection = () => {
-    return collections.find(c => item.token_address === c.token_address);
-  }
+    return collections.find((c) => item.token_address === c.token_address);
+  };
 
   const buyNow = async (stripe = false) => {
     setInternalLoading(true);
@@ -64,7 +68,7 @@ const NFTCard = (props) => {
       // whatever
     }
     setInternalLoading(false);
-  }
+  };
 
   const buyButtons = () => {
     if (props?.owned) {
@@ -72,36 +76,45 @@ const NFTCard = (props) => {
     }
 
     if (!isAuthenticated) {
-      return (<Link href={'/signup'}>
+      return (
+        // <Link href={"/signup"}>
+        <>
+          <button
+            className="btn btn-success btn-lg d-flex align-items-center justify-content-center"
+            onClick={() => setModalShow(true)}
+          >
+            Login to buy
+          </button>
+          <ModalPopup show={modalShow} onHide={() => setModalShow(false)} />
+        </>
+        // </Link>
+      );
+    }
+    return (
+      <div>
         <button
           className="btn btn-success btn-lg d-flex align-items-center justify-content-center"
+          onClick={() => buyNow(false)}
+          disabled={!item?.sale || item.available < 1}
         >
-          Login to buy
+          Buy now with MARTEX&nbsp;
+          {internalLoading && (
+            <div className="spinner-border text-light" role="status" />
+          )}
         </button>
-      </Link>);
-    }
-    return (<div>
-      <button
-        className="btn btn-success btn-lg d-flex align-items-center justify-content-center"
-        onClick={() => buyNow(false)}
-        disabled={!item?.sale || item.available < 1}
-      >
-        Buy now with MARTEX&nbsp;
-        {internalLoading && (<div className="spinner-border text-light" role="status" />)}
-
-      </button>
-      <button
-        className="btn btn-primary btn-lg d-flex align-items-center justify-content-center mt-2"
-        onClick={() => buyNow(true)}
-        disabled={!item?.sale || item.available < 1}
-      >
-        Buy now with USD&nbsp;
-        {internalLoading && (<div className="spinner-border text-light" role="status" />)}
-
-      </button>
-    </div>
+        <button
+          className="btn btn-primary btn-lg d-flex align-items-center justify-content-center mt-2"
+          onClick={() => buyNow(true)}
+          disabled={!item?.sale || item.available < 1}
+        >
+          Buy now with USD&nbsp;
+          {internalLoading && (
+            <div className="spinner-border text-light" role="status" />
+          )}
+        </button>
+      </div>
     );
-  }
+  };
 
   if (!item) {
     return null;
@@ -116,7 +129,7 @@ const NFTCard = (props) => {
               src={item.image_thumb_uri}
               className="rounded mx-auto d-block rounded mb-3 img-wrap"
               alt=""
-              width={'100%'}
+              width={"100%"}
               height={width}
               ref={listRef}
             />
@@ -129,29 +142,44 @@ const NFTCard = (props) => {
           </div>
 
           <h4 className="card-title">{item.name}</h4>
-          <p>
-            {truncate(item.description)}
-          </p>
+          <p>{truncate(item.description)}</p>
 
           <div className="d-flex justify-content-between">
             <div className="text-start">
-              <p className="mb-2">
-                {getCollection()?.name}
-              </p>
+              <p className="mb-2">{getCollection()?.name}</p>
             </div>
           </div>
           <div className="d-flex justify-content-between">
-            <div className="text-start">
-              {props?.owned ? (<h5 className="text-muted">{item.available}</h5>) : (<h5 className="text-muted">{item.available || 0}/{item.amount}</h5>)}
+            <div className="text-start d-flex align-items-start gap-2">
+              {props?.owned ? (
+                <h5 className="text-muted">{item.available}</h5>
+              ) : (
+                <h5 className="text-muted">
+                  {item.available || 0}/{item.amount}
+                </h5>
+              )}
+              <button
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  padding: "0",
+                }}
+                onClick={() => initial()}
+              >
+                {Refresh()}
+              </button>
             </div>
             <div className="text-end">
               <h5 className="text-success">{item.price} MARTEX</h5>
-              <h5 className="text-primary">{moneyFormatMartexToDollar(item.price)} USD</h5>
+              <h5 className="text-primary">
+                {moneyFormatMartexToDollar(item.price)} USD
+              </h5>
             </div>
           </div>
 
-
-          {props?.children ? props.children : (
+          {props?.children ? (
+            props.children
+          ) : (
             <div className="d-flex justify-content-center mt-3 flex-column">
               {buyButtons()}
               <Link href={`/detail/${item.id}`}>
@@ -160,28 +188,39 @@ const NFTCard = (props) => {
             </div>
           )}
 
-
           <div className="d-flex justify-content-center flex-column">
-            <button onClick={()=>setisshare(isshare!==true?true:false)} className="btn btn-outline-primary">Share</button>
+            <button
+              onClick={() => setisshare(isshare !== true ? true : false)}
+              className="btn btn-outline-primary"
+            >
+              Share
+            </button>
           </div>
 
-      {isshare !==false?
-      <div className='share_icons'>
-      <div className='row'>
-        <div className='col-3 p-2' style={{cursor:'pointer'}}>{Facebook()}</div>
-        <div className='col-3 p-2' style={{cursor:'pointer'}}>{Instagram()}</div>
-        <div className='col-3 p-2' style={{cursor:'pointer'}}>{Whatsapp()}</div>
-        <div className='col-3 p-2' style={{cursor:'pointer'}}>{Discord()}</div>
-      </div>
-      </div>
-      :""
-      }
-         
-
+          {isshare !== false ? (
+            <div className="share_icons">
+              <div className="row">
+                <div className="col-3 p-2" style={{ cursor: "pointer" }}>
+                  {Facebook()}
+                </div>
+                <div className="col-3 p-2" style={{ cursor: "pointer" }}>
+                  {Instagram()}
+                </div>
+                <div className="col-3 p-2" style={{ cursor: "pointer" }}>
+                  {Whatsapp()}
+                </div>
+                <div className="col-3 p-2" style={{ cursor: "pointer" }}>
+                  {Discord()}
+                </div>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default NFTCard;

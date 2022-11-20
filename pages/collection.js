@@ -6,7 +6,7 @@ import { useMoralis, useMoralisQuery, useMoralisWeb3Api } from "react-moralis";
 import NFTCard from "../components/nfts/NFTCard";
 import { convertNFTs } from "../utils/converters";
 import ReactPaginate from "react-paginate";
-import ModalPopup from "../components/elements/ModalPopup";
+// import ModalPopup from "../components/elements/ModalPopup";
 // ES2022 @end: Imports
 
 // ES2022 @start: hardcoded settings
@@ -14,12 +14,14 @@ import ModalPopup from "../components/elements/ModalPopup";
 
 function Bill() {
   // ES2022 @start: Settings
-  let itemsPerPage = 2;
+  let itemsPerPage = 8;
   const [nfts, setNfts] = React.useState([]);
   const [initNfts, setInitNfts] = React.useState([]);
+  const [currentItems, setCurrentItems] = React.useState([]);
+  const [pageCount, setPageCount] = React.useState(0);
   const [collections, setCollections] = React.useState([]);
 
-  const [modalShow, setModalShow] = React.useState(false);
+  // const [modalShow, setModalShow] = React.useState(false);
   const [itemOffset, setItemOffset] = React.useState(0);
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -110,6 +112,10 @@ function Bill() {
       setNfts(tmpNFTs);
       setInitNfts(tmpNFTs);
       setIsLoading(false);
+      setFilteredCollection();
+      const endOffset = itemOffset + itemsPerPage;
+      setCurrentItems(tmpNFTs?.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(tmpNFTs?.length / itemsPerPage));
     }
   };
 
@@ -121,18 +127,32 @@ function Bill() {
 
   React.useEffect(() => {
     if (filteredCollection) {
-      setNfts((ns) =>
-        ns.filter((n) => n.token_address === filteredCollection.token_address)
+      // setNfts((ns) =>
+      //   ns.filter((n) => n.token_address === filteredCollection.token_address)
+      // );
+      const filter = nfts?.filter(
+        (item) => item?.token_address === filteredCollection?.token_address
       );
+      const endOffset = itemOffset + itemsPerPage;
+      setCurrentItems(filter?.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(filter?.length / itemsPerPage));
+      // setCurrentItems(filter);
+      // setPageCount(Math.ceil(filter?.length / itemsPerPage));
     } else {
-      setNfts(initNfts);
+      // setNfts(initNfts);
+      const endOffset = itemOffset + itemsPerPage;
+      setCurrentItems(initNfts?.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(initNfts?.length / itemsPerPage));
+
+      // setCurrentItems(initNfts);
+      // setPageCount(Math.ceil(initNfts?.length / itemsPerPage));
     }
   }, [filteredCollection]);
 
-  const recalling = () => {
-    getMasterNFTs();
-    setIsLoading(false);
-  };
+  // const recalling = () => {
+  //   getMasterNFTs();
+  //   setIsLoading(false);
+  // };
 
   // setInterval(() => {
   //   setIsLoading(true);
@@ -141,14 +161,19 @@ function Bill() {
   //   }, 2000);
   // }, 20000);
 
-  const endOffset = itemOffset + itemsPerPage;
-  let currentItems = nfts?.slice(itemOffset, endOffset);
-  let pageCount = Math.ceil(nfts?.length / itemsPerPage);
+  // React.useEffect(() => {
+  //   const endOffset = itemOffset + itemsPerPage;
+  //   setCurrentItems(nfts?.slice(itemOffset, endOffset));
+  //   setPageCount(Math.ceil(nfts?.length / itemsPerPage));
+  // }, [nfts]);
 
   // Invoke when user click to request another page.
   const handlePageClick = (event) => {
     const newOffset = (event.selected * itemsPerPage) % nfts?.length;
     setItemOffset(newOffset);
+    const endOffset = newOffset + itemsPerPage;
+    setCurrentItems(nfts?.slice(newOffset, endOffset));
+    setPageCount(Math.ceil(nfts?.length / itemsPerPage));
   };
 
   return (
@@ -162,14 +187,14 @@ function Bill() {
         child={"Collection"}
       >
         <div className="col-12">
-          <button
+          {/* <button
             className="btn btn-outline-primary btn-lg"
             variant="primary"
             onClick={() => setModalShow(true)}
           >
             Information
           </button>
-          <ModalPopup show={modalShow} onHide={() => setModalShow(false)} />
+          <ModalPopup show={modalShow} onHide={() => setModalShow(false)} /> */}
           <div className="card filter-tab">
             <div className="card-header">
               <div className="filter-nav">
@@ -205,7 +230,12 @@ function Bill() {
                 <div className="row">
                   {/* ES2022: Use NFTCard to get the right style for a listed item*/}
                   {currentItems?.map((nft, index) => (
-                    <NFTCard item={nft} collections={collections} key={index} />
+                    <NFTCard
+                      item={nft}
+                      collections={collections}
+                      key={index}
+                      initial={initial}
+                    />
                   ))}
                   <div>
                     <ReactPaginate
