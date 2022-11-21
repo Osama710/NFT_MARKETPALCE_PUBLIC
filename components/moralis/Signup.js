@@ -1,5 +1,5 @@
 import React from "react";
-import Moralis from "moralis";
+// import Moralis from "moralis";
 import * as referral from "../../utils/referrals";
 import { useMoralis, useMoralisCloudFunction } from "react-moralis";
 import { useDeviceSelectors } from "react-device-detect";
@@ -27,6 +27,7 @@ const Signup = (props) => {
   }, []);
 
   const [register, setRegister] = React.useState(true);
+  const [forgotPass, setForgotPass] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoading2, setIsLoading2] = React.useState(false);
 
@@ -50,7 +51,7 @@ const Signup = (props) => {
     isWeb3Enabled,
     isAuthenticated,
     isInitialized,
-    // Moralis,
+    Moralis,
   } = useMoralis();
   const moralisCloudSendWallet = useMoralisCloudFunction("sendWalletViaEmail");
 
@@ -220,6 +221,33 @@ const Signup = (props) => {
     setValidPassword(isValidPassword);
   };
 
+  const forgotPassword = async () => {
+    const Validation = await validation();
+    setError(undefined);
+    setValidEmail(true);
+
+    if (!email) {
+      setValidEmail(false);
+      return;
+    }
+
+    const isValidEmail = Validation.isValidEmail(email);
+
+    if (isValidEmail && isInitialized) {
+      setIsLoading(true);
+
+      Moralis.User.requestPasswordReset(email)
+        .then(() => {
+          console.log("Password Reset Email sent successfully.");
+        })
+        .catch((error) => {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+      setIsLoading(false);
+    }
+    setValidEmail(isValidEmail);
+  };
+
   let submit = (
     <>
       <div className={"row"}>
@@ -357,155 +385,227 @@ const Signup = (props) => {
       </div>
       <div className="card">
         <div className="card-body p-4 mb-5">
-          <input
-            name={"username"}
-            type={"text"}
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setValidUsername(true);
-            }}
-            className={"form-control form-control-lg"}
-            placeholder={"username"}
-          />
-          {!validUsername && (
-            <div className="form-text text-danger">
-              Minimum length: 6 characters.
-            </div>
-          )}
-
-          {register && (
-            <input
-              name={"email"}
-              type={"email"}
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setValidEmail(true);
-              }}
-              className={"form-control form-control-lg mt-4"}
-              placeholder={"email"}
-            />
-          )}
-          {!validEmail && (
-            <div className="form-text text-danger">
-              Please provide a valid email.
-            </div>
-          )}
-
-          {register && (
-            <input
-              name={"email_confirmation"}
-              type={"email"}
-              value={emailConfirmation}
-              onChange={(e) => {
-                setEmailConfirmation(e.target.value);
-                setValidEmailConfirmation(true);
-              }}
-              className={"form-control form-control-lg mt-4"}
-              placeholder={"Confirm email"}
-            />
-          )}
-          {!validEmailConfirmation && (
-            <div className="form-text text-danger">
-              Please type again your email.
-            </div>
-          )}
-
-          <input
-            name={"password"}
-            type={"password"}
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setValidPassword(true);
-            }}
-            className={"form-control form-control-lg mt-4"}
-            placeholder={"Password"}
-          />
-          {!validPassword && (
-            <div className="form-text text-danger">
-              Minimum length: 6 characters.
-            </div>
-          )}
-
-          {register && (
-            <input
-              name={"password_confirmation"}
-              type={"password"}
-              value={passwordConf}
-              onChange={(e) => {
-                setPasswordConf(e.target.value);
-                setValidPasswordConf(true);
-              }}
-              className={"form-control form-control-lg mt-4"}
-              placeholder={"Confirm password"}
-            />
-          )}
-          {!validPasswordConf && (
-            <div className="form-text text-danger">Passwords do not match.</div>
-          )}
-
-          {register && (
+          {forgotPass ? (
             <>
-              By registering you agree to our&nbsp;
-              <a
-                href={
-                  "https://www.mars1982.com/INDEPENDENT%20PROMOTER%20AGREEMENT/"
-                }
-                target={"_blank"}
-              >
-                Independent promoter agreement
-              </a>
-              &nbsp;and&nbsp;
-              <a
-                href={
-                  "https://www.mars1982.com/mars-1982-ltd-terms-of-service-and-privacy-policy/"
-                }
-                target={"_blank"}
-              >
-                Terms of service and Privacy policy
-              </a>
+              <h6>Forgot Password</h6>
+              <input
+                name={"email"}
+                type={"email"}
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setValidEmail(true);
+                }}
+                className={"form-control form-control-lg mt-4"}
+                placeholder={"email"}
+              />
+              <div className={"d-grid gap-2 mt-4 mb-2"}>
+                <button
+                  className={"btn btn-success btn-lg"}
+                  onClick={forgotPassword}
+                >
+                  {isLoading && (
+                    <span
+                      className="spinner-grow spinner-grow-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  )}
+                  Send Email
+                </button>
+              </div>
+              <div className={"col d-grid mt-4"}>
+                <button
+                  className={"btn btn-outline-primary btn-lg"}
+                  onClick={() => {
+                    setForgotPass(false);
+                    setRegister(false);
+                  }}
+                >
+                  {isLoading && (
+                    <span
+                      className="spinner-grow spinner-grow-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  )}
+                  Remember Password? Login instead
+                </button>
+              </div>
+              <div className={"col d-grid mt-2"}>
+                <button
+                  className={"btn btn-outline-primary btn-lg"}
+                  onClick={() => {
+                    setForgotPass(false);
+                    setRegister(true);
+                  }}
+                >
+                  {isLoading && (
+                    <span
+                      className="spinner-grow spinner-grow-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  )}
+                  New user? Register first
+                </button>
+              </div>
             </>
-          )}
-          <p className="mb-0 mt-1" style={{ cursor: "pointer" }}>
-            Forget Password
-          </p>
-          <div className={"d-grid gap-2 mt-4 mb-2"}>
-            {error && <div className="form-text text-danger">{error}</div>}
-            {submit}
-          </div>
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-            }}
-          >
-            <h6>
-              OR
-              {/* <br></br>Login With */}
-            </h6>
-          </div>
-          <div className={"d-grid gap-2 mt-2"}>
-            <button
-              className={"btn btn-outline-primary btn-lg"}
-              onClick={handleCustomLogin}
-            >
-              {isLoading2 && (
-                <span
-                  className="spinner-grow spinner-grow-sm"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
+          ) : (
+            <>
+              <input
+                name={"username"}
+                type={"text"}
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setValidUsername(true);
+                }}
+                className={"form-control form-control-lg"}
+                placeholder={"username"}
+              />
+              {!validUsername && (
+                <div className="form-text text-danger">
+                  Minimum length: 6 characters.
+                </div>
               )}
-              Register with a Social Account
-            </button>
-          </div>
 
-          {/* <div className={"d-grid gap-2 mt-2"}>
+              {register && (
+                <input
+                  name={"email"}
+                  type={"email"}
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setValidEmail(true);
+                  }}
+                  className={"form-control form-control-lg mt-4"}
+                  placeholder={"email"}
+                />
+              )}
+              {!validEmail && (
+                <div className="form-text text-danger">
+                  Please provide a valid email.
+                </div>
+              )}
+
+              {register && (
+                <input
+                  name={"email_confirmation"}
+                  type={"email"}
+                  value={emailConfirmation}
+                  onChange={(e) => {
+                    setEmailConfirmation(e.target.value);
+                    setValidEmailConfirmation(true);
+                  }}
+                  className={"form-control form-control-lg mt-4"}
+                  placeholder={"Confirm email"}
+                />
+              )}
+              {!validEmailConfirmation && (
+                <div className="form-text text-danger">
+                  Please type again your email.
+                </div>
+              )}
+
+              <input
+                name={"password"}
+                type={"password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setValidPassword(true);
+                }}
+                className={"form-control form-control-lg mt-4"}
+                placeholder={"Password"}
+              />
+              {!validPassword && (
+                <div className="form-text text-danger">
+                  Minimum length: 6 characters.
+                </div>
+              )}
+
+              {register && (
+                <input
+                  name={"password_confirmation"}
+                  type={"password"}
+                  value={passwordConf}
+                  onChange={(e) => {
+                    setPasswordConf(e.target.value);
+                    setValidPasswordConf(true);
+                  }}
+                  className={"form-control form-control-lg mt-4"}
+                  placeholder={"Confirm password"}
+                />
+              )}
+              {!validPasswordConf && (
+                <div className="form-text text-danger">
+                  Passwords do not match.
+                </div>
+              )}
+
+              {register && (
+                <>
+                  By registering you agree to our&nbsp;
+                  <a
+                    href={
+                      "https://www.mars1982.com/INDEPENDENT%20PROMOTER%20AGREEMENT/"
+                    }
+                    target={"_blank"}
+                  >
+                    Independent promoter agreement
+                  </a>
+                  &nbsp;and&nbsp;
+                  <a
+                    href={
+                      "https://www.mars1982.com/mars-1982-ltd-terms-of-service-and-privacy-policy/"
+                    }
+                    target={"_blank"}
+                  >
+                    Terms of service and Privacy policy
+                  </a>
+                </>
+              )}
+              <a onClick={() => setForgotPass(true)}>
+                <p className="mb-0 mt-1" style={{ cursor: "pointer" }}>
+                  Forget Password
+                </p>
+              </a>
+              <div className={"d-grid gap-2 mt-4 mb-2"}>
+                {error && <div className="form-text text-danger">{error}</div>}
+                {submit}
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                }}
+              >
+                <h6>
+                  OR
+                  {/* <br></br>Login With */}
+                </h6>
+              </div>
+              <div className={"d-grid gap-2 mt-2"}>
+                <button
+                  className={"btn btn-outline-primary btn-lg"}
+                  onClick={handleCustomLogin}
+                >
+                  {isLoading2 && (
+                    <span
+                      className="spinner-grow spinner-grow-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  )}
+                  Register with a Social Account
+                </button>
+              </div>
+
+              {/* <div className={"d-grid gap-2 mt-2"}>
             <div
               style={{
                 width: "100%",
@@ -562,6 +662,8 @@ const Signup = (props) => {
               </button>
             </div>
           </div> */}
+            </>
+          )}
         </div>
       </div>
     </>
