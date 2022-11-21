@@ -453,6 +453,7 @@ const Signup = (props) => {
             </>
           ) : (
             <>
+              {register ? <h6>Register</h6> : <h6>Login</h6>}
               <input
                 name={"username"}
                 type={"text"}
@@ -545,7 +546,7 @@ const Signup = (props) => {
               )}
 
               {register && (
-                <>
+                <div className="mt-3">
                   By registering you agree to our&nbsp;
                   <a
                     href={
@@ -564,13 +565,15 @@ const Signup = (props) => {
                   >
                     Terms of service and Privacy policy
                   </a>
-                </>
+                </div>
               )}
-              <a onClick={() => setForgotPass(true)}>
-                <p className="mb-0 mt-1" style={{ cursor: "pointer" }}>
-                  Forget Password
-                </p>
-              </a>
+              {!register && (
+                <a onClick={() => setForgotPass(true)}>
+                  <p className="mb-0 pt-3" style={{ cursor: "pointer" }}>
+                    Forgot Password?
+                  </p>
+                </a>
+              )}
               <div className={"d-grid gap-2 mt-4 mb-2"}>
                 {error && <div className="form-text text-danger">{error}</div>}
                 {submit}
