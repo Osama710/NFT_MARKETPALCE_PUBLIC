@@ -5,8 +5,27 @@ import { moneyFormatMartexToDollar, truncate } from "../../utils/converters";
 import { useMoralis } from "react-moralis";
 import { useDeviceSelectors } from "react-device-detect";
 import ModalPopup from "../elements/ModalPopup";
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+  TwitterIcon,
+  TwitterShareButton,
+  LinkedinIcon,
+  LinkedinShareButton,
+} from "next-share";
+import { useRouter } from "next/router";
 
 const NFTCard = (props) => {
+  const router = useRouter();
+  const [urlHost, setUrlHost] = React.useState("");
+  React.useEffect(() => {
+    const host = window.location.host;
+    const baseUrl = `https://${host}`;
+
+    setUrlHost(`${baseUrl}`);
+  }, [router]);
   const Facebook = () => <img src={"/images/facebook.png"} height={32} />;
   const [isshare, setisshare] = React.useState(false);
   const Refresh = () => (
@@ -201,16 +220,39 @@ const NFTCard = (props) => {
             <div className="share_icons">
               <div className="row">
                 <div className="col-3 p-2" style={{ cursor: "pointer" }}>
-                  {Facebook()}
+                  {/* {Facebook()} */}
+                  <FacebookShareButton
+                    url={urlHost + `/detail/${item.id}`}
+                    quote={item.name}
+                    hashtag={"#nft #marsNft #blockchain"}
+                  >
+                    <FacebookIcon size={32} round />
+                  </FacebookShareButton>
                 </div>
                 <div className="col-3 p-2" style={{ cursor: "pointer" }}>
-                  {Instagram()}
+                  {/* {Instagram()} */}
+                  <TwitterShareButton
+                    url={urlHost + `/detail/${item.id}`}
+                    title={item.name}
+                  >
+                    <TwitterIcon size={32} round />
+                  </TwitterShareButton>
                 </div>
                 <div className="col-3 p-2" style={{ cursor: "pointer" }}>
-                  {Whatsapp()}
+                  {/* {Whatsapp()} */}
+                  <WhatsappShareButton
+                    url={urlHost + `/detail/${item.id}`}
+                    title={item.name}
+                    separator=":: "
+                  >
+                    <WhatsappIcon size={32} round />
+                  </WhatsappShareButton>
                 </div>
                 <div className="col-3 p-2" style={{ cursor: "pointer" }}>
-                  {Discord()}
+                  {/* {Discord()} */}
+                  <LinkedinShareButton url={urlHost + `/detail/${item.id}`}>
+                    <LinkedinIcon size={32} round />
+                  </LinkedinShareButton>
                 </div>
               </div>
             </div>
